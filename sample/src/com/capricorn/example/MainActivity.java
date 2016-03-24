@@ -16,15 +16,15 @@
 
 package com.capricorn.example;
 
+import com.capricorn.ArcMenu;
+import com.capricorn.RayMenu;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.Toast;
-
-import com.capricorn.ArcMenu;
-import com.capricorn.RayMenu;
 
 /**
  * 

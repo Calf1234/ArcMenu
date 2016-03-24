@@ -41,6 +41,7 @@ public class RayMenu extends RelativeLayout {
 		mRayLayout = (RayLayout) findViewById(R.id.item_layout);
 
 		final ViewGroup controlLayout = (ViewGroup) findViewById(R.id.control_layout);
+		//setClickable(false)：一定程度上会导致菜单项展不开
 		controlLayout.setClickable(true);
 		controlLayout.setOnTouchListener(new OnTouchListener() {
 
@@ -48,6 +49,8 @@ public class RayMenu extends RelativeLayout {
 			public boolean onTouch(View v, MotionEvent event) {
 				if (event.getAction() == MotionEvent.ACTION_DOWN) {
 					mHintView.startAnimation(createHintSwitchAnimation(mRayLayout.isExpanded()));
+					//展开、收起菜单项
+					//动画 + view.layout
 					mRayLayout.switchState(true);
 				}
 
@@ -142,6 +145,8 @@ public class RayMenu extends RelativeLayout {
 	}
 
 	private static Animation createHintSwitchAnimation(final boolean expanded) {
+		//expanded ->true 逆时针转45
+		//expanded ->false 顺时针45
 		Animation animation = new RotateAnimation(expanded ? 45 : 0, expanded ? 0 : 45, Animation.RELATIVE_TO_SELF,
 				0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
 		animation.setStartOffset(0);

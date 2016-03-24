@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android" >
-
+<!-- 
+减少视图层级 :merge 
+  用于替换FrameLayout、
+  或者当一个布局包含另一个时，merge标签消除视图层次结构中多余的视图组。
+-->
     <com.capricorn.ArcLayout
         xmlns:custom="http://schemas.android.com/apk/res-auto"
         android:id="@+id/item_layout"

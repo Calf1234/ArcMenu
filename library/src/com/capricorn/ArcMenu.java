@@ -32,6 +32,7 @@ import android.view.animation.ScaleAnimation;
 import android.view.animation.Animation.AnimationListener;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 /**
  * A custom view that looks like the menu in <a href="https://path.com">Path
@@ -70,6 +71,7 @@ public class ArcMenu extends RelativeLayout {
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     mHintView.startAnimation(createHintSwitchAnimation(mArcLayout.isExpanded()));
+                    //菜单弹出
                     mArcLayout.switchState(true);
                 }
 
@@ -91,6 +93,8 @@ public class ArcMenu extends RelativeLayout {
             int defaultChildSize = mArcLayout.getChildSize();
             int newChildSize = a.getDimensionPixelSize(R.styleable.ArcLayout_childSize, defaultChildSize);
             mArcLayout.setChildSize(newChildSize);
+            
+//            Toast.makeText(getContext(), "fromDegrees :" + fromDegrees + " toDegrees :" + toDegrees + " defaultChildSize :" + defaultChildSize + " newChildSize :" + newChildSize, 1).show();
 
             a.recycle();
         }
@@ -183,7 +187,9 @@ public class ArcMenu extends RelativeLayout {
         Animation animation = new RotateAnimation(expanded ? 45 : 0, expanded ? 0 : 45, Animation.RELATIVE_TO_SELF,
                 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
         animation.setStartOffset(0);
-        animation.setDuration(100);
+        animation.setDuration(200);
+        //动画的变化率
+        //在动画开始的地方速率改变比较慢，然后开始减速
         animation.setInterpolator(new DecelerateInterpolator());
         animation.setFillAfter(true);
 

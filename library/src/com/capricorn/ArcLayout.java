@@ -24,12 +24,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationSet;
 import android.view.animation.Interpolator;
+import android.view.animation.LayoutAnimationController;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.view.animation.RotateAnimation;
-import android.view.animation.Animation.AnimationListener;
 
 /**
  * A Layout that arranges its children around its center. The arc can be set by
@@ -107,6 +108,7 @@ public class ArcLayout extends ViewGroup {
                 (int) (childCenterX + size / 2), (int) (childCenterY + size / 2));
     }
 
+    //决定view本身大小
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         final int radius = mRadius = computeRadius(Math.abs(mToDegrees - mFromDegrees), getChildCount(), mChildSize,
@@ -122,6 +124,7 @@ public class ArcLayout extends ViewGroup {
         }
     }
 
+    //决定view在viewgroup中的位置
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         final int centerX = getWidth() / 2;
@@ -179,6 +182,7 @@ public class ArcLayout extends ViewGroup {
         animationSet.setFillAfter(true);
 
         final long preDuration = duration / 2;
+        //旋转
         Animation rotateAnimation = new RotateAnimation(0, 360, Animation.RELATIVE_TO_SELF, 0.5f,
                 Animation.RELATIVE_TO_SELF, 0.5f);
         rotateAnimation.setStartOffset(startOffset);
@@ -187,7 +191,7 @@ public class ArcLayout extends ViewGroup {
         rotateAnimation.setFillAfter(true);
 
         animationSet.addAnimation(rotateAnimation);
-
+        //收回
         Animation translateAnimation = new RotateAndTranslateAnimation(0, toXDelta, 0, toYDelta, 360, 720);
         translateAnimation.setStartOffset(startOffset + preDuration);
         translateAnimation.setDuration(duration - preDuration);
@@ -203,10 +207,12 @@ public class ArcLayout extends ViewGroup {
         final boolean expanded = mExpanded;
         final int centerX = getWidth() / 2;
         final int centerY = getHeight() / 2;
+//        Toast.makeText(getContext(), "centerX :" + centerX + " centerY" + centerY + " mRadius :" + mRadius, 1).show();
         final int radius = expanded ? 0 : mRadius;
 
         final int childCount = getChildCount();
         final float perDegrees = (mToDegrees - mFromDegrees) / (childCount - 1);
+//        Toast.makeText(getContext(), "centerX :" + centerX + " centerY" + centerY + " radius :" + mRadius + " degrees :" + mFromDegrees + index * perDegrees + " size :" + mFromDegrees + index * perDegrees, 1).show();
         Rect frame = computeChildFrame(centerX, centerY, radius, mFromDegrees + index * perDegrees, mChildSize);
 
         final int toXDelta = frame.left - child.getLeft();

@@ -103,12 +103,14 @@ public class RotateAndTranslateAnimation extends Animation {
         mPivotYType = RELATIVE_TO_SELF;
     }
 
+    //封装成Transformation类
     @Override
     protected void applyTransformation(float interpolatedTime, Transformation t) {
         final float degrees = mFromDegrees + ((mToDegrees - mFromDegrees) * interpolatedTime);
         if (mPivotX == 0.0f && mPivotY == 0.0f) {
             t.getMatrix().setRotate(degrees);
         } else {
+        	//初始化时，设置绕自身旋转
             t.getMatrix().setRotate(degrees, mPivotX, mPivotY);
         }
 
@@ -120,10 +122,11 @@ public class RotateAndTranslateAnimation extends Animation {
         if (mFromYDelta != mToYDelta) {
             dy = mFromYDelta + ((mToYDelta - mFromYDelta) * interpolatedTime);
         }
-
+        //平移
         t.getMatrix().postTranslate(dx, dy);
     }
 
+    //初始化
     @Override
     public void initialize(int width, int height, int parentWidth, int parentHeight) {
         super.initialize(width, height, parentWidth, parentHeight);

@@ -14,6 +14,7 @@ import android.view.animation.LinearInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.view.animation.RotateAnimation;
 import android.view.animation.Animation.AnimationListener;
+import android.widget.Toast;
 
 public class RayLayout extends ViewGroup {
 
@@ -53,10 +54,11 @@ public class RayLayout extends ViewGroup {
 		return Math.max((int) (width / childCount - childSize), minGap);
 	}
 
+	//mExpanded, paddingLeft, i, mChildGap, mChildSize
 	private static Rect computeChildFrame(final boolean expanded, final int paddingLeft, final int childIndex,
 			final int gap, final int size) {
 		final int left = expanded ? (paddingLeft + childIndex * (gap + size) + gap) : ((paddingLeft - size) / 2);
-
+//		final int left = expanded ? (paddingLeft + childIndex * (gap + size) + gap) : 0;
 		return new Rect(left, 0, left + size, size);
 	}
 
@@ -73,7 +75,7 @@ public class RayLayout extends ViewGroup {
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(getSuggestedMinimumHeight(), MeasureSpec.EXACTLY));
-
+//		Toast.makeText(getContext(), "onMeasure", 1).show();
 		final int count = getChildCount();
 		mChildGap = computeChildGap(getMeasuredWidth() - mLeftHolderWidth, count, mChildSize, 0);
 
@@ -85,11 +87,13 @@ public class RayLayout extends ViewGroup {
 
 	@Override
 	protected void onLayout(boolean changed, int l, int t, int r, int b) {
+//		Toast.makeText(getContext(), "onLayout", 1).show();
 		final int paddingLeft = mLeftHolderWidth;
 		final int childCount = getChildCount();
 
 		for (int i = 0; i < childCount; i++) {
 			Rect frame = computeChildFrame(mExpanded, paddingLeft, i, mChildGap, mChildSize);
+			//呈现view
 			getChildAt(i).layout(frame.left, frame.top, frame.right, frame.bottom);
 		}
 
@@ -98,6 +102,7 @@ public class RayLayout extends ViewGroup {
 	/**
 	 * refers to {@link LayoutAnimationController#getDelayForView(View view)}
 	 */
+//	childCount, mExpanded, index, 0.1f, duration, interpolator
 	private static long computeStartOffset(final int childCount, final boolean expanded, final int index,
 			final float delayPercent, final long duration, Interpolator interpolator) {
 		final float delay = delayPercent * duration;
@@ -116,8 +121,11 @@ public class RayLayout extends ViewGroup {
 
 	private static Animation createExpandAnimation(float fromXDelta, float toXDelta, float fromYDelta, float toYDelta,
 			long startOffset, long duration, Interpolator interpolator) {
+		//平移 + 绕自身720
 		Animation animation = new RotateAndTranslateAnimation(0, toXDelta, 0, toYDelta, 0, 720);
+		//动画的开始时间 相对
 		animation.setStartOffset(startOffset);
+//		animation.setStartOffset(5000);
 		animation.setDuration(duration);
 		animation.setInterpolator(interpolator);
 		animation.setFillAfter(true);
@@ -127,6 +135,7 @@ public class RayLayout extends ViewGroup {
 
 	private static Animation createShrinkAnimation(float fromXDelta, float toXDelta, float fromYDelta, float toYDelta,
 			long startOffset, long duration, Interpolator interpolator) {
+		//AnimationSet：动画组合
 		AnimationSet animationSet = new AnimationSet(false);
 		animationSet.setFillAfter(true);
 
@@ -154,14 +163,17 @@ public class RayLayout extends ViewGroup {
 	private void bindChildAnimation(final View child, final int index, final long duration) {
 		final boolean expanded = mExpanded;
 		final int childCount = getChildCount();
+		//菜单项将显示的区域
 		Rect frame = computeChildFrame(!expanded, mLeftHolderWidth, index, mChildGap, mChildSize);
 
 		final int toXDelta = frame.left - child.getLeft();
 		final int toYDelta = frame.top - child.getTop();
 
+		//OvershootInterpolator ：向前甩一定值再，回到原来位置
 		Interpolator interpolator = mExpanded ? new AccelerateInterpolator() : new OvershootInterpolator(1.5f);
+		//加载菜单项 开始时间不同
 		final long startOffset = computeStartOffset(childCount, mExpanded, index, 0.1f, duration, interpolator);
-
+//		Toast.makeText(getContext(), "startOffset :" + startOffset, 1).show();
 		Animation animation = mExpanded ? createShrinkAnimation(0, toXDelta, 0, toYDelta, startOffset, duration,
 				interpolator) : createExpandAnimation(0, toXDelta, 0, toYDelta, startOffset, duration, interpolator);
 
@@ -191,7 +203,8 @@ public class RayLayout extends ViewGroup {
 				}
 			}
 		});
-
+		//动画有自己的开始时间
+		//若想立即开始动画，调用startAnimation
 		child.setAnimation(animation);
 	}
 
@@ -218,7 +231,7 @@ public class RayLayout extends ViewGroup {
 		if (showAnimation) {
 			final int childCount = getChildCount();
 			for (int i = 0; i < childCount; i++) {
-				bindChildAnimation(getChildAt(i), i, 300);
+				bindChildAnimation(getChildAt(i), i, 3000);
 			}
 		}
 
@@ -228,6 +241,7 @@ public class RayLayout extends ViewGroup {
 			requestLayout();
 		}
 
+		//——> onDraw
 		invalidate();
 	}
 
@@ -236,7 +250,8 @@ public class RayLayout extends ViewGroup {
 		for (int i = 0; i < childCount; i++) {
 			getChildAt(i).clearAnimation();
 		}
-
+		//不掉用 ——> 有动画效果，但view不可见
+		//requestLayout去调用onMeasure、onLayout
 		requestLayout();
 	}
 
